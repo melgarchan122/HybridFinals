@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+
+  users User[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+
+  roleId    Int
+  role      Role     @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  pokemon   Pokemon[]
+}
+
+model Pokemon {
+  id        Int      @id @default(autoincrement())
+  species   String
+  nickname  String?
+  nature    String
+  level     Int
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  evRecord         EVRecord?
+  trainingSessions TrainingSession[]
+}
+
+model EVRecord {
+  id         Int @id @default(autoincrement())
+
+  hp         Int @default(0)
+  attack     Int @default(0)
+  defense    Int @default(0)
+  spAttack   Int @default(0)
+  spDefense  Int @default(0)
+  speed      Int @default(0)
+
+  pokemonId  Int     @unique
+  pokemon    Pokemon @relation(fields: [pokemonId], references: [id])
+}
+
+model TrainingSession {
+  id         Int      @id @default(autoincrement())
+
+  stat       String
+  evGained   Int
+  method     String
+
+  createdAt  DateTime @default(now())
+
+  pokemonId  Int
+  pokemon    Pokemon  @relation(fields: [pokemonId], references: [id])
+}
